@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
+    
+     <!-- 파일 하나를 만들고, 거기에 우리가 남기고있는 로그들을 저장함 -->
+	<File name = "MyFile" fileName = "logs/app.log">
+	 <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+	</File>
+  </Appenders>
+
+
+	<!-- 
+	모든 로거(로깅하는 객체들)는 Root로거(모든로거들의 최상위같은 개념)를 상속받는다고 생각하면 됨 (공통부분은 Root를 통해 설정)
+	주석풀었다가 말았다가 안해도 되고, 로그를 남길지 말지 레벨로 컨트롤 할 수 있음
+	-->
+  <Loggers>
+  	<!-- 여기에 로거 추가 -->
+	
+    
+    <Root level="trace">
+      <AppenderRef ref="Console"/>
+    </Root>
+    
+  </Loggers>
+
+</Configuration>
+
+
+
+
+

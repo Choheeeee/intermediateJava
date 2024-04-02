@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- id는 개별 SQL 문장을 식별하고, namespace는 SQL 매퍼 파일 내에서 이름 공간을 정의하며, 여기에 속하는 모든 SQL 문장은 해당 namespace에 함-->
+<!-- <mapper namespace="memberTest"> -->
+<mapper namespace="member">
+
+<!-- 매퍼는 데이터와 애플리케이션 사이의 매핑 또는 변환을 담당하는 소프트웨어 구성 요소를 가리킴 -->
+
+<!--  
+	이 영역에 SQL문에 맞는 태그를 사용하여 SQL을 기술한다.
+	
+	사용할 수 있는 기본적인 태그들
+	<select>~~~</select>
+	<insert>~~~</insert>
+	<update>~~~</update>
+	<delete>~~~</delete>
+	
+	위 태그에서 사용되는 속성들
+	1) id(sql문 각각을 식볋) : 해당 태그를 호출할때 namespace(패키지와 비슷한 개념)와 연결하여 사용하는 이름
+	2) parameterType : 쿼리 수행시 사용할 데이터 타입을 지정한다.
+					(보통 VO클래스, 자바의 기본타입 이름 등이 사용된다 - 클래스명이 같아 충돌을 막기위해, 패키지부터 풀 클래스명을 기술한다.)
+					
+					
+	//select를 실행 후 나온 결과를 VO객체의 속성(멤버필드)에 담기위해, mybatis에게 쿼리 결과가 어떤 객체로 어떻게 맵핑해야하는지 알려주는 키워드
+	3) resultType : select문을 실행한 결과를 담을 객체 타입을 지정한다.
+					(보통 VO클래스, 자바의 기본타입 이름 등이 사용된다 - 클래스명이 같아 충돌을 막기위해, 패키지부터 풀 클래스명을 기술한다.)
+	4) resultMap : 결과 레코드 컬럼명과 VO객체의 property명이 다를 경우에 적절한 매핑을 위해 사용한다.
+-->
+
+	<insert id="insertMember" parameterType="kr.or.ddit.member.vo.MemberVO">
+	
+		INSERT INTO mymember (mem_id, mem_name, mem_tel, mem_addr)
+			VALUES (#{memId}, #{memName}, #{memTel}, #{memAddr})	<!-- 전에는 prepardStatement의 ?를 써서 동적쿼리를 실행했지만, mv의 속성(멤버)을 #{}을통해 기술해주면
+																mybatis는 속성명을 보고, 유추하여 자동으로 파라미터로 날라오는 MemberVO에서  mv.getMemeId등 속성에 맞는 getter를 호출해서 실제 쿼리를 날림. -->
+	
+	</insert>
+	
+	
+	<update id="updateMember" parameterType="kr.or.ddit.member.vo.MemberVO">
+	
+		update mymember 
+			set mem_name = #{memName}
+			, mem_tel = #{memTel}
+			, mem_addr = #{memAddr} 
+			where mem_id = #{memId}
+	
+	</update>
+	
+	
+	<delete id="deleteMember" parameterType="String">	<!-- parameterType="String" -> 파라미터로 "d001"가 날라오므로, d001의 타입인 String -->
+	
+	
+		<!-- 파라미터 타입이 객체일때만, 그 객체의 getter를 유추하여 찾아야 하므로 #{}안의 값이 유의미하다. 
+		그래서 파라미터로 객체가 날라올때만 MemberVO의 getter메서드를 유추하게끔 MemberVO가 갖고있는 속성명을 정확하게 써준다.-->
+		delete from mymember where mem_id = #{memId}
+	
+	</delete>
+	
+	
+	
+	
+	<!-- mybatis에게 select를 조회했으면, 그 결과를 MemberVO타입으로 MemberVO가 가진 속성들에 채워서 달라고 하는것
+		(resultType="kr.or.ddit.member.vo.MemberVO"을 써줌으로써 결과물을 담을 타입을(타입 : MemberVO) 알려주는것)
+		결과를 MemberVO에 담아주기 위해서 mybatis는 내부적으로 자동으로 생성자를 호출한다.  
+		생성자를 호출한 후, 우리가 만들어놓은 setter메서드의 이름을 유추하여 mybatis가 받아온 컬럼별로 MemberVO의 해당 속성에 넣어줌
+		그래서 mybatis가 우리가 만든 setter를 유추할 수 있게, "as memId"를 덧붙여 작성하는데 작성할땐 setter메서드 이름으로 알려줘야함-->
+	<!-- resultType : select문을 실행한 결과를 담을 객체 타입을 지정한다.
+					(보통 VO클래스, 자바의 기본타입 이름 등이 사용된다 - 클래스명이 같아 충돌을 막기위해, 패키지부터 풀 클래스명을 기술한다.) -->	
+	<!-- <select id="selectAllMember" resultType="kr.or.ddit.member.vo.MemberVO">
+		select mem_id as memId,
+		 	mem_name as memName, 
+		 	mem_tel as memTel,
+		  	mem_addr as memAddr 
+		  	from mymember
+	
+	</select> -->
+	
+	
+	<!-- resultMap : 결과 레코드 컬럼명과 VO객체의 property명이 다를 경우에 적절한 매핑을 위해 사용한다. -->
+	<resultMap type ="memVO" id = "memMap"> 
+			<result column = "mem_id" property="memId"/>
+			<result column = "mem_name" property="memName"/>
+			<result column = "mem_tel" property="memTel"/>
+			<result column = "mem_addr" property="memAddr"/>
+			<result column = "reg_dt" property="regDt"/>
+	</resultMap>
+	
+	<select id="selectAllMember" resultMap="memMap">
+		select * from mymember
+	</select>
+	
+	
+	
+	<!-- select실행 결과가 1개일때 -->
+	<select id="getMember" parameterType = "String" resultMap = "memMap">
+		select * from mymember where mem_id = #{memId}
+	</select>
+	
+	
+	<select id="checkMember" parameterType="String" resultType="int">
+		select count(*) from mymember where mem_id = #{memId}
+	</select>
+	
+	
+	<select id="searchMember" resultMap="memMap">
+		select * from mymember where 1=1
+			<if test='memId != null and memId != ""'>
+				and mem_id = #{memId}
+			</if>
+			
+			<if test='memName != null and memName != ""'>
+				and mem_name = #{memName}
+			</if>
+			
+			<if test='memTel != null and !memTel.equals("")'>
+				and mem_tel = #{memTel}
+			</if>
+			
+			<if test='memAddr != null and memAddr != ""'>
+				and mem_addr like '%' || #{memAddr} || '%'
+			</if>
+			
+		
+		
+	</select>
+
+<!--
+ 매퍼파일을 만들때마다, mybatis를 설정한 파일(mybatis-config.xml)에게  실행할 매퍼인 member.xml파일의 경로를 알려줘야함 
+ 
+ 예시) mybatis설정파일인 mybatis-config.xml로 가서 아래 내용을 입력!	
+ 	<mappers>
+		<mapper resource="mappers/member.xml"/>
+	</mappers>
+ -->
+</mapper>
